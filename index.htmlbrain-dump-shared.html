@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain Dump — Athena</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #1a3028;
+    --forest-mid: #24402f;
+    --forest-light: #2d5040;
+    --gold: #b8935a;
+    --gold-light: #d4aa78;
+    --gold-pale: #f5ede0;
+    --cream: #f2efe6;
+    --cream-dark: #e4e0d5;
+    --text: #1c1c1a;
+    --muted: #6b6760;
+    --white: #fafaf7;
+    --green-pale: #eaf2eb;
+    --red-pale: #fdecea;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--forest);
+    padding: 0 32px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    letter-spacing: 0.14em;
+    color: var(--white);
+  }
+  .header-pipe { width: 1px; height: 18px; background: rgba(255,255,255,0.18); }
+  .header-sub {
+    font-size: 11px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* View toggle */
+  .toggle-wrap {
+    display: flex;
+    background: rgba(255,255,255,0.07);
+    border-radius: 6px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .toggle-btn {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.45);
+    background: transparent;
+    transition: all 0.18s;
+  }
+  .toggle-btn.active {
+    background: rgba(255,255,255,0.14);
+    color: var(--white);
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HERO ── */
+  .hero { margin-bottom: 28px; }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    color: var(--forest);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .hero-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 500px;
+  }
+
+  /* ── INPUT CARD ── */
+  .input-card {
+    background: var(--white);
+    border: 1.5px solid var(--gold);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 12px rgba(184,147,90,0.08);
+  }
+
+  .dump-textarea {
+    width: 100%;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    min-height: 72px;
+    line-height: 1.6;
+  }
+  .dump-textarea::placeholder { color: #c2bfb7; font-style: italic; }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--cream-dark);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag-btn {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 1px solid var(--cream-dark);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tag-btn:hover, .tag-btn.sel {
+    border-color: var(--gold);
+    color: var(--forest);
+    background: var(--gold-pale);
+  }
+
+  .send-btn {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 10px 24px;
+    border-radius: 6px;
+    background: var(--forest);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+  }
+  .send-btn:hover { background: var(--forest-light); }
+  .send-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .count-pill {
+    background: var(--gold);
+    color: var(--forest);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+
+  /* ── ITEM CARDS ── */
+  .item-card {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    animation: slideIn 0.22s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .item-card:hover { border-color: var(--cream-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .item-card.done { opacity: 0.5; }
+  .item-card.done .item-text { text-decoration: line-through; color: var(--muted); }
+
+  .check-btn {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--cream-dark);
+    flex-shrink: 0;
+    margin-top: 1px;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .check-btn:hover { border-color: var(--gold); }
+  .item-card.done .check-btn {
+    background: #d1ead9;
+    border-color: #2d6a4f;
+  }
+  .item-card.done .check-btn::after {
+    content: '✓';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    color: #2d6a4f;
+    font-weight: 700;
+  }
+
+  .item-body { flex: 1; min-width: 0; }
+  .item-text { font-size: 14px; font-weight: 300; line-height: 1.6; color: var(--text); }
+  .item-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+  .item-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 2px 9px;
+    border-radius: 20px;
+  }
+  .tag-quick    { background: #faeedd; color: #9a6a2a; }
+  .tag-project  { background: #e1f5ee; color: #0f6e56; }
+  .tag-research { background: #e6f1fb; color: #185fa5; }
+  .tag-draft    { background: #eeedfe; color: #534ab7; }
+  .tag-other    { background: #f1efe8; color: #5f5e5a; }
+
+  .item-time { font-size: 11px; color: var(--muted); font-weight: 300; }
+  .done-label { font-size: 11px; color: #2d6a4f; font-weight: 400; }
+
+  .del-btn {
+    background: none; border: none;
+    color: #d0cdc8; font-size: 14px;
+    cursor: pointer; padding: 2px 4px;
+    transition: color 0.15s; line-height: 1;
+    flex-shrink: 0;
+  }
+  .del-btn:hover { color: #e24b4a; }
+
+  /* ── JOY BANNER ── */
+  .joy-banner {
+    background: var(--forest);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .joy-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    color: var(--forest); flex-shrink: 0;
+  }
+  .joy-text { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 300; line-height: 1.55; }
+  .joy-text strong { color: var(--white); font-weight: 700; }
+
+  /* ── FILTERS ── */
+  .filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filters { display: flex; gap: 5px; flex-wrap: wrap; }
+  .filter-btn {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px;
+    border: 1px solid var(--cream-dark);
+    background: transparent; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .filter-btn.active {
+    background: var(--forest);
+    color: var(--white);
+    border-color: var(--forest);
+  }
+
+  /* ── LOADING / EMPTY ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--cream-dark);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-msg {
+    font-size: 12px;
+    font-weight: 300;
+    padding: 8px 14px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .status-msg.success { background: var(--green-pale); color: #2d6a4f; display: block; }
+  .status-msg.error   { background: var(--red-pale); color: #c0392b; display: block; }
+
+  .footer-note {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--muted);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">ATHENA</div>
+    <div class="header-pipe"></div>
+    <div class="header-sub">Brain Dump</div>
+  </div>
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" id="btn-jash" onclick="switchView('jash')">Jash</button>
+    <button class="toggle-btn" id="btn-joy" onclick="switchView('joy')">Joy</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── JASH PANEL ── -->
+  <div class="panel active" id="panel-jash">
+    <div class="hero">
+      <h1 class="hero-title">What's on your plate?</h1>
+      <p class="hero-sub">Drop anything here — tasks, ideas, things you'd love off your plate. Joy picks it up and runs with it. No formatting needed.</p>
+    </div>
+
+    <div class="input-card">
+      <textarea class="dump-textarea" id="dump-input"
+        placeholder="e.g. Chase the podcast producer who hasn't replied… or research venues for the Q3 off-site…"
+        rows="3"></textarea>
+      <div class="input-footer">
+        <div class="tag-row" id="tag-row">
+          <button class="tag-btn sel" data-tag="quick">Quick task</button>
+          <button class="tag-btn" data-tag="project">Project</button>
+          <button class="tag-btn" data-tag="research">Research</button>
+          <button class="tag-btn" data-tag="draft">Draft</button>
+          <button class="tag-btn" data-tag="other">Other</button>
+        </div>
+        <button class="send-btn" id="send-btn" onclick="submitItem()">Send to Joy →</button>
+      </div>
+    </div>
+
+    <div id="status-msg" class="status-msg"></div>
+
+    <div class="section-label">
+      Sent to Joy
+      <span class="count-pill" id="jash-count">0</span>
+    </div>
+    <div id="jash-list"><div class="loading-state"><div class="spinner"></div> Loading…</div></div>
+  </div>
+
+  <!-- ── JOY PANEL ── -->
+  <div class="panel" id="panel-joy">
+    <div class="joy-banner">
+      <div class="joy-avatar">J</div>
+      <div class="joy-text">
+        <strong>Hi Joy.</strong> Here's everything Jash has dropped for you. Mark items done as you complete them — Jash sees your progress in real time.
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="section-label" style="margin-bottom:0">
+        Action items
+        <span class="count-pill" id="joy-count">0</span>
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
+        <button class="filter-btn" onclick="setFilter(this,'pending')">To do</button>
+        <button class="filter-btn" onclick="setFilter(this,'done')">Done</button>
+      </div>
+    </div>
+
+    <div id="joy-list"><div class="loading-state"><div class="spinner"></div> Loading…</div></div>
+  </div>
+
+  <p class="footer-note">© 2026 Athena · Confidential & Proprietary · Syncs in real time for Jash & Joy</p>
+</div>
+
+<script>
+  // ── STATE ──
+  let items = [];
+  let selectedTag = 'quick';
+  let currentFilter = 'all';
+  let currentView = 'jash';
+  let isSaving = false;
+  const STORAGE_KEY = 'athena-braindump-shared-v1';
+
+  const tagLabels = { quick:'Quick task', project:'Project', research:'Research', draft:'Draft', other:'Other' };
+  const tagClass  = { quick:'tag-quick', project:'tag-project', research:'tag-research', draft:'tag-draft', other:'tag-other' };
+
+  // ── STORAGE (uses artifact persistent storage if available, falls back to localStorage) ──
+  async function loadItems() {
+    try {
+      if (window.storage) {
+        const result = await window.storage.get(STORAGE_KEY, true); // shared=true
+        items = result ? JSON.parse(result.value) : [];
+      } else {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        items = saved ? JSON.parse(saved) : [];
+      }
+    } catch(e) {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        items = saved ? JSON.parse(saved) : [];
+      } catch(e2) { items = []; }
+    }
+    render();
+  }
+
+  async function saveItems() {
+    try {
+      if (window.storage) {
+        await window.storage.set(STORAGE_KEY, JSON.stringify(items), true); // shared=true
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      }
+    } catch(e) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch(e2) {}
+    }
+  }
+
+  // ── TAG SELECTION ──
+  document.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      selectedTag = btn.dataset.tag;
+    });
+  });
+
+  // ── SUBMIT ──
+  async function submitItem() {
+    const val = document.getElementById('dump-input').value.trim();
+    if (!val || isSaving) return;
+    isSaving = true;
+    const btn = document.getElementById('send-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    items.unshift({ id: Date.now(), text: val, tag: selectedTag, ts: Date.now(), done: false });
+    await saveItems();
+
+    document.getElementById('dump-input').value = '';
+    showStatus('Sent to Joy ✓', 'success');
+    isSaving = false;
+    btn.disabled = false;
+    btn.textContent = 'Send to Joy →';
+    render();
+  }
+
+  document.getElementById('dump-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitItem();
+  });
+
+  function showStatus(msg, type) {
+    const el = document.getElementById('status-msg');
+    el.textContent = msg;
+    el.className = 'status-msg ' + type;
+    setTimeout(() => { el.className = 'status-msg'; }, 3000);
+  }
+
+  // ── TOGGLE DONE ──
+  async function toggleDone(id) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    item.done = !item.done;
+    item.doneAt = item.done ? Date.now() : null;
+    await saveItems();
+    render();
+  }
+
+  // ── DELETE ──
+  async function deleteItem(id) {
+    items = items.filter(i => i.id !== id);
+    await saveItems();
+    render();
+  }
+
+  // ── FILTER ──
+  function setFilter(btn, filter) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = filter;
+    render();
+  }
+
+  // ── VIEW SWITCH ──
+  function switchView(v) {
+    currentView = v;
+    document.getElementById('panel-jash').classList.toggle('active', v === 'jash');
+    document.getElementById('panel-joy').classList.toggle('active', v === 'joy');
+    document.getElementById('btn-jash').classList.toggle('active', v === 'jash');
+    document.getElementById('btn-joy').classList.toggle('active', v === 'joy');
+  }
+
+  // ── TIME FORMAT ──
+  function timeAgo(ts) {
+    const diff = Math.floor((Date.now() - ts) / 60000);
+    if (diff < 1) return 'just now';
+    if (diff < 60) return diff + 'm ago';
+    if (diff < 1440) return Math.floor(diff/60) + 'h ago';
+    return Math.floor(diff/1440) + 'd ago';
+  }
+
+  function esc(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── RENDER ──
+  function render() {
+    const pending = items.filter(i => !i.done).length;
+    document.getElementById('jash-count').textContent = items.length;
+    document.getElementById('joy-count').textContent = pending;
+
+    renderJash();
+    renderJoy();
+  }
+
+  function renderJash() {
+    const list = document.getElementById('jash-list');
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state">Nothing here yet — drop your first task above.</div>';
+      return;
+    }
+    list.innerHTML = items.map(item => `
+      <div class="item-card ${item.done ? 'done' : ''}">
+        <button class="check-btn" onclick="toggleDone(${item.id})"></button>
+        <div class="item-body">
+          <div class="item-text">${esc(item.text)}</div>
+          <div class="item-meta">
+            <span class="item-tag ${tagClass[item.tag]}">${tagLabels[item.tag]}</span>
+            <span class="item-time">${timeAgo(item.ts)}</span>
+            ${item.done ? '<span class="done-label">✓ Done by Joy</span>' : ''}
+          </div>
+        </div>
+        <button class="del-btn" onclick="deleteItem(${item.id})" title="Remove">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function renderJoy() {
+    const list = document.getElementById('joy-list');
+    let filtered = items;
+    if (currentFilter === 'pending') filtered = items.filter(i => !i.done);
+    if (currentFilter === 'done')    filtered = items.filter(i => i.done);
+
+    if (!filtered.length) {
+      list.innerHTML = `<div class="empty-state">${currentFilter === 'done' ? 'No completed items yet.' : currentFilter === 'pending' ? 'Nothing left to do — great work!' : 'Nothing from Jash yet.'}</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(item => `
+      <div class="item-card ${item.done ? 'done' : ''}">
+        <button class="check-btn" onclick="toggleDone(${item.id})" title="${item.done ? 'Mark incomplete' : 'Mark done'}"></button>
+        <div class="item-body">
+          <div class="item-text">${esc(item.text)}</div>
+          <div class="item-meta">
+            <span class="item-tag ${tagClass[item.tag]}">${tagLabels[item.tag]}</span>
+            <span class="item-time">${timeAgo(item.ts)}</span>
+            ${item.done ? `<span class="done-label">✓ Completed ${item.doneAt ? timeAgo(item.doneAt) : ''}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── AUTO REFRESH every 30s for real-time feel ──
+  setInterval(async () => {
+    await loadItems();
+  }, 30000);
+
+  // ── INIT ──
+  loadItems();
+</script>
+</body>
+</html>
